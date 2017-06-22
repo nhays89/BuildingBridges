@@ -2,7 +2,7 @@
 
 ACM ICPC World Finals 2003 - Graph theory
 
-![alt](https://github.com/nhays89/Promotions/blob/master/BuildingBridges/buildingbridges.PNG)
+![alt](https://github.com/nhays89/BuildingBridges/blob/master/BuildingBridges/buildingbridges.PNG)
 
 The City Council of New Altonville plans to build a system of bridges connecting all of its downtown
 buildings together so people can walk from one building to another without going outside. You must
