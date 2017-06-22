@@ -250,16 +250,16 @@ function PriorityHeap() {
 
     var heap = [];
     this.h = heap;
-    var insertIndex = 0;
+    var lastInsert = 0;
 
     this.insert = function(child) {
         if (heap.length == 0) {
             heap.push(child);
-            insertIndex++;
+            lastInsert++;
             return;
         }
         heap.push(child);
-        insertIndex++;
+        lastInsert++;
         var curr = heap.length - 1;
         var parentIndex;
         while (curr > 0) {
@@ -297,15 +297,15 @@ function PriorityHeap() {
             } else if (right >= heap.length) { //then only left can be checked
                 if (heap[curr].dist > heap[left].dist) {
                     swap(curr, left);
-                    break;
                 }
+                break;
             } else {
                 var smaller = heap[left].dist < heap[right].dist ? left : right;
                 if (heap[curr].dist > heap[smaller].dist) {
                     swap(curr, smaller);
                     curr = smaller;
                 } else {
-                	break;
+                    break;
                 }
             }
         }
