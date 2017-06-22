@@ -142,58 +142,213 @@ function getAdjNodes(row, col) {
 }
 
 function search() {
-    for (var row in map) {
-        for (var col in row) {
-            var node = map[row][col];
-            var sx, sy, key;
+    for (var r in map) {
+        var row = map[r];
+        for (var c in row) {
+            var node = row[c];
+            var dx, dy, key;
             var bldg = node.bldg;
-            var x = row;
-            var y = col;
+            var x = node.x;
+            var y = node.y;
 
             //left top going left
             if (x - 1 >= 0 && y - 2 >= 0 && !map[x - 1][y - 1]) {
-                sx = x - 1;
-                sy = y - 2;
-                while (sy >= 0) {
-                    if (map[sx][sy]) {
-                        if (map[sx][sy].bldg != bldg) {
-                            queue.
-                        } else {
-                            break;
+                dx = x - 1;
+                dy = y - 2;
+                while (dy >= 0) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
                         }
+                        break;
                     }
-                    sy--;
+                    dy--;
                 }
             }
-            //left 
-            x && y - 1 >= 0
-                //left bottom
-            x + 1 <= rows, y - 1 >= 0
-                //bottom left
-            x + 1 <= rows, y - 1 >= 0
-                //bottom
-            y && x + 1 <= rows
-                //bottom right
-            y + 1 <= cols && x + 1 <= rows
-                //right bottom
-                //right
-                //right top
-                //top right
-                //top 
-                //top left
+            //left going left
+            if (y - 2 >= 0 && !map[x][y - 1]) {
+                dx = x;
+                dy = y - 2;
+                while (dy >= 0) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                        }
+                        break;
+                    }
+                    dy--;
+                }
+            }
 
+            //left bottom going left
+            if (x + 1 < rows && y - 2 >= 0 && !map[x + 1][y - 1]) {
+                dx = x + 1;
+                dy = y - 2;
+                while (dy >= 0) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                        }
+                        break;
+                    }
+                    dy--;
+                }
+
+            }
+
+            //bottom left going down
+            if (x + 2 < rows && y - 1 >= 0 && !map[x + 1][y - 1]) {
+                dx = x + 2;
+                dy = y - 1;
+                while (dx < rows) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                        }
+                        break;
+                    }
+                    dx++;
+                }
+            }
+            //bottom going down
+            if (x + 2 < rows && !map[x + 1][y]) {
+                dx = x + 2;
+                dy = y;
+                while (dx < rows) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                        }
+                        break;
+                    }
+                    dx++;
+                }
+
+            }
+
+            //bottom right going down
+            if (y + 1 < cols && x + 2 < rows && !map[x + 1][y + 1]) {
+                dx = x + 2;
+                dy = y + 1;
+                while (dx < rows) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                        }
+                        break;
+                    }
+                    dx++;
+                }
+            }
+
+            //right bottom going right
+            if (x + 1 < rows && y + 2 < cols && !map[x + 1][y + 1]) {
+                dx = x + 1;
+                dy = y + 2;
+                while (dy < cols) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                        }
+                        break;
+                    }
+                    dy++;
+                }
+            }
+
+            //right going right
+            if (y + 2 < cols && !map[x][y + 1]) {
+                dx = x;
+                dy = y + 2;
+                while (dy < cols) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                        }
+                        break;
+                    }
+                    dy++;
+                }
+            }
+
+            //right top going right
+            if (x - 1 >= 0 && y + 2 < cols && !map[x - 1][y + 1]) {
+                dx = x - 1;
+                dy = y + 2;
+                while (dy < cols) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                        }
+                        break;
+                    }
+                    dy++;
+                }
+
+            }
+            //top right going up
+            if (x - 2 >= 0 && y + 1 < cols && !map[x - 1][y + 1]) {
+                dx = x - 2;
+                dy = y + 1;
+                while (dx >= 0) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                        }
+                        break;
+                    }
+                    dx--;;
+                }
+
+            }
+            //top going up
+            if (x - 2 >= 0 && !map[x - 1][y]) {
+                dx = x - 2;
+                dy = y;
+                while (dx >= 0) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                        }
+                        break;
+                    }
+                    dx--;;
+                }
+
+            }
+
+            //top left going up
+            if (x - 2 >= 0 && y - 1 >= 0 && !map[x - 1][y - 1]) {
+                dx = x - 2;
+                dy = y - 1;
+                while (dx >= 0) {
+                    if (map[dx][dy]) {
+                        if (map[dx][dy].bldg != bldg) {
+                            var destNode = map[dx][dy];
+                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                        }
+                        break;
+                    }
+                    dx--;;
+                }
+
+            }
 
         }
     }
-
-
-
-
 }
 
-
-
-}
 
 function buildBridges() {
 
@@ -204,6 +359,7 @@ function PriorityHeap() {
 
     var heap = [];
     this.h = heap;
+    this.new = 0;
     var lastInsert = 0;
 
     this.insert = function(child) {
@@ -211,23 +367,31 @@ function PriorityHeap() {
             heap.push(child);
             lastInsert++;
             return;
-        }
-        heap.push(child);
-        lastInsert++;
-        var curr = heap.length - 1;
-        var parentIndex;
-        while (curr > 0) {
-            if (curr % 2 == 0) {
-                parentIndex = Math.floor(curr / 2) - 1;
-            } else {
-                parentIndex = Math.floor(curr / 2);
+        } else if (heap.length == 1) {
+            heap.push(child);
+            lastInsert++;
+            if (heap[1].dist < heap[0].dist) {
+                swap(0, 1);
+                return;
             }
+        } else {
+            heap.push(child);
+            lastInsert++;
+            var curr = heap.length - 1;
+            var parentIndex;
+            while (curr > 0) {
+                if (curr % 2 == 0) {
+                    parentIndex = Math.floor(curr / 2) - 1;
+                } else {
+                    parentIndex = Math.floor(curr / 2);
+                }
 
-            if (heap[curr].dist < heap[parentIndex].dist) {
-                swap(curr, parentIndex);
-                curr = parentIndex;
-            } else {
-                break;
+                if (heap[curr].dist < heap[parentIndex].dist) {
+                    swap(curr, parentIndex);
+                    curr = parentIndex;
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -265,6 +429,14 @@ function PriorityHeap() {
         }
         lastInsert--;
         return el;
+    }
+
+    this.clear = function() {
+        var len = heap.length;
+        for (var i = 0; i < len; i++) {
+            heap.pop();
+        }
+        lastInsert = 0;
     }
 
 
