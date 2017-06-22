@@ -1,165 +1,120 @@
-//globals
+//Author: Nicholas A. Hays
 
+//globals
 var rows, cols, map, queue, arr;
 
-
 //runner
-
 function main(input) {
-
-
     var data = input.splice("\n");
-
     var index = 0;
-
     var city = 0;
-
     while (true) {
-
         var dims = data[index++].splice(" ");
-
         rows = dims[0];
-
         cols = dims[1];
-
-        queue = [];
+        queue = new PriorityHeap();
         map = {};
         arr = [];
-        city++;
         if (rows == 0 && cols == 0)
             break;
-
         for (var i = 0; i < rows; i++) {
-
             arr[i] = [];
-
             var str = data[index++];
-
             map[i] = {};
-
             for (var j = 0; j < cols; j++) {
-
                 arr[i][j] = str[j];
-
             }
         }
-
         var numOfBldgs = genBldgs();
         var bldgs = [];
-        for (var b = 0; b < bldgs; b++) {
-            bldgs[b] = b;
+        for (i = 0; i < numOfBldgs; i++) {
+            bldgs[i] = i;
         }
         search();
         buildBridges();
         output();
-
     }
-
-
 }
 
 //generate buildings 
-
 function genBldgs() {
-
     var numOfBldgs = 0;
-
     for (var i = 0; i < rows; i++) {
         for (var j = 0; j < cols; j++) {
-
             if (arr[i][j] == "#") {
-
-
-                if (map[i][j]) {
-                    continue;
-                } else {
+                if (!map[i][j]) {
                     var bldg = genBldg(i, j, numOfBldgs);
                     numOfBldgs++;
                 }
-
             }
-
         }
     }
     return numOfBldgs;
 
 }
 
-
 //generate building
-
 function genBldg(row, col, bldg) {
-
-
     if (map[row][col]) {
         return;
     }
     map[row][col] = { x: row, y: col, bldg: bldg };
-
-    var nodes = getAdjNodes(row, col); //returns only nodes not in map
-
+    var nodes = getAdjNodes(row, col); 
     for (var n: nodes) {
-
         genBldg(n.x, n.y, bldg);
-
     }
-
-
-
 }
 
-//get adjacent nodes in bldg
 
+//get adjacent nodes in bldg that are currently not in the map of nodes
 function getAdjNodes(row, col) {
-
-
-    var stack = [];
+    var nodes = [];
     var el;
-    //left row, col -1
+    //left: row, col -1
     if (col - 1 >= 0) {
         el = arr[row][col - 1];
         if (el == '#' && !map[row][col - 1]) {
-            stack.push({ x: row, y: col - 1 });
+            nodes.push({ x: row, y: col - 1 });
         }
     }
 
-    //bottom left row + 1, col -1
-    if (row + 1 <= rows && col - 1 >= 0) {
+    //bottom left: row + 1, col -1
+    if (row + 1 < rows && col - 1 >= 0) {
         el = arr[row + 1][col - 1];
         if (el == '#' && !map[row + 1][col - 1]) {
-            stack.push({ x: row + 1, y: col - 1 });
+            nodes.push({ x: row + 1, y: col - 1 });
         }
     }
 
     //bottom row + 1, col
-    if (row + 1 <= rows) {
+    if (row + 1 < rows) {
         el = arr[row + 1][col];
         if (el == '#' && !map[row + 1][col]) {
-            stack.push({ x: row + 1, y: col });
+            nodes.push({ x: row + 1, y: col });
         }
     }
 
     //bottom right row + 1, col + 1
-    if (row + 1 <= rows && col + 1 <= cols) {
+    if (row + 1 < rows && col + 1 < cols) {
         el = arr[row + 1][col + 1];
         if (el == '#' && !map[row + 1][col + 1]) {
-            stack.push({ x: row + 1, y: col + 1 });
+            nodes.push({ x: row + 1, y: col + 1 });
         }
     }
 
     //right row, col + 1
-    if (col + 1 <= cols) {
+    if (col + 1 < cols) {
         el = arr[row][col + 1];
         if (el == '#' && !map[row][col + 1]) {
-            stack.push({ x: row, y: col + 1 });
+            nodes.push({ x: row, y: col + 1 });
         }
     }
 
     //top right row -1, col + 1
-    if (row - 1 >= 0 && col + 1 <= cols) {
+    if (row - 1 >= 0 && col + 1 < cols) {
         el = arr[row - 1][col + 1];
         if (el == '#' && !map[row - 1][col + 1]) {
-            stack.push({ x: row - 1, y: col + 1 });
+            nodes.push({ x: row - 1, y: col + 1 });
         }
     }
 
@@ -167,7 +122,7 @@ function getAdjNodes(row, col) {
     if (row - 1 >= 0) {
         el = arr[row - 1][col];
         if (el == '#' && !map[row - 1][col]) {
-            stack.push({ x: row - 1, y: col });
+            nodes.push({ x: row - 1, y: col });
         }
     }
 
@@ -176,17 +131,15 @@ function getAdjNodes(row, col) {
     if (row - 1 >= 0 && col - 1 >= 0) {
         el = arr[row - 1][col - 1];
         if (el == '#' && !map[row - 1][col - 1]) {
-            stack.push({ x: row - 1, y: col - 1 });
+            nodes.push({ x: row - 1, y: col - 1 });
         }
     }
 
-    return stack;
+    return nodes;
 
 }
 
 function search() {
-
-
     for (var row in map) {
         for (var col in row) {
             var node = map[row][col];
@@ -196,13 +149,12 @@ function search() {
             var y = col;
 
             //left top going left
-            if (x - 1 >= 0 && y - 2 >= 0 && !map[x - 1][y - 1]) { //same bldg but closer to next bldg from this position
+            if (x - 1 >= 0 && y - 2 >= 0 && !map[x - 1][y - 1]) {
                 sx = x - 1;
                 sy = y - 2;
                 while (sy >= 0) {
-
                     if (map[sx][sy]) {
-                        if (ma[sx][sy].bldg != bldg) {
+                        if (map[sx][sy].bldg != bldg) {
                             queue.
                         } else {
                             break;
