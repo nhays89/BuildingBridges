@@ -43,7 +43,7 @@ function genBldgs() {
         for (var j = 0; j < cols; j++) {
             if (arr[i][j] == "#") {
                 if (!map[i][j]) {
-                    var bldg = genBldg(i, j, numOfBldgs);
+                    genBldg(i, j, numOfBldgs);
                     numOfBldgs++;
                 }
             }
@@ -59,11 +59,13 @@ function genBldg(row, col, bldg) {
         return;
     }
     map[row][col] = { x: row, y: col, bldg: bldg };
-    var nodes = getAdjNodes(row, col); 
-    for (var n: nodes) {
-        genBldg(n.x, n.y, bldg);
-    }
+    var nodes = getAdjNodes(row, col);
+    nodes.forEach(function(o) {
+        genBldg(o.x, o.y, bldg);
+    });
+
 }
+
 
 
 //get adjacent nodes in bldg that are currently not in the map of nodes
