@@ -1,13 +1,14 @@
 //Author: Nicholas A. Hays
 
 //globals
-var rows, cols, map, queue, arr;
+var rows, cols, map, queue, arr, blgs;
 
 //runner
 function main(input) {
     var data = input.splice("\n");
     var index = 0;
     var city = 0;
+
     while (true) {
         var dims = data[index++].splice(" ");
         rows = dims[0];
@@ -15,6 +16,7 @@ function main(input) {
         queue = new PriorityHeap();
         map = {};
         arr = [];
+        bldgs = [];
         if (rows == 0 && cols == 0)
             break;
         for (var i = 0; i < rows; i++) {
@@ -26,13 +28,12 @@ function main(input) {
             }
         }
         var numOfBldgs = genBldgs();
-        var bldgs = [];
         for (i = 0; i < numOfBldgs; i++) {
             bldgs[i] = i;
         }
         search();
-        buildBridges();
-        output();
+        var data = buildBridges();
+        output(data);
     }
 }
 
@@ -351,6 +352,34 @@ function search() {
 
 
 function buildBridges() {
+
+	//while obj && els
+	var bridge = queue.poll();
+	var numOfBridges = 0;
+	var bridgesLength = 0;
+	while(bridge && bldgs.length > 0) {
+		if(blgs[bridge.src] || bldgs[bridge.dest]) {
+			numOfBridges++;
+			bridgesLength += bridge.dist;
+			var srcIndex = bldgs.indexOf(bridge.src);
+			if(srcIndex > -1) {
+				bldgs.splice(srcIndex, 1);
+			}
+			var destIndex = bldgs.indexOf(bridge.dest);
+			if(destIndex > -1) {
+				bldgs.splice(destIndex, 1);
+			}
+		}
+		bridge = queue.poll();
+	}
+	return { numOfBridges: numOfBridges, len: bridgesLength, remaining: bldgs.length};
+}
+
+
+function output() {
+
+
+
 
 }
 
