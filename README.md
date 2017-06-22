@@ -24,7 +24,6 @@ building. In City 4, the best solution uses a single bridge of length 1 to conne
 two disconnected groups (one containing two buildings and one containing a single building).</br>
 
 ## Input
----
 The input data set describes several rectangular cities. Each city description begins with a line containing
 two integers r and c, representing the size of the city on the north-south and east-west axes
 measured in grid lengths (1 ≤ r ≤ 100 and 1 ≤ c ≤ 100). These numbers are followed by exactly r lines,
@@ -34,7 +33,6 @@ corresponds to a square that is not occupied by a building.</br>
 The input data for the last city will be followed by a line containing two zeros.</br>
 
 ## Output 
----
 For each city description, print two or three lines of output as shown below. The first line consists of
 the city number. If the city has fewer than two buildings, the second line is the sentence ‘No bridges
 are needed.’. If the city has two or more buildings but none of them can be connected by bridges, the
@@ -46,7 +44,6 @@ groups.</br>
 Print a blank line between cases. Use the output format shown in the example.</br>
 
 ## Sample Input
----
 3 5</br>
 #. . . #</br>
 . . # . .</br>
@@ -66,8 +63,6 @@ Print a blank line between cases. Use the output format shown in the example.</b
 0 0</br>
 
 ## Sample Output
----
-
 <samp>City 1</samp></br>
 4 bridges of total length 4</br>
 <samp>City 2</samp></br>
@@ -80,7 +75,6 @@ No bridges are needed.</br>
 2 disconnected groups</br>
 
 ## Solution
----
 1) parse input.<br>
 2) generate nodes for each # and group adjacent nodes into buildings.<br>
 3) calculate bridge length between each node in each building from its reachable neighbor nodes in every direction<br>
