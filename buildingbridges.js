@@ -249,12 +249,14 @@ function buildBridges() {
 function PriorityHeap() {
 
     var heap = [];
+    this.h = heap;
     var insertIndex = 0;
 
     this.insert = function(child) {
         if (heap.length == 0) {
             heap.push(child);
             insertIndex++;
+            return;
         }
         heap.push(child);
         insertIndex++;
@@ -262,9 +264,9 @@ function PriorityHeap() {
         var parentIndex;
         while (curr > 0) {
             if (curr % 2 == 0) {
-                parentIndex = curr / 2 - 1;
+                parentIndex = Math.floor(curr / 2) - 1;
             } else {
-                parentIndex = curr / 2;
+                parentIndex = Math.floor(curr / 2);
             }
 
             if (heap[curr].dist < heap[parentIndex].dist) {
@@ -293,15 +295,17 @@ function PriorityHeap() {
             if (left >= heap.length) {
                 break;
             } else if (right >= heap.length) { //then only left can be checked
-                if (heap[curr] > heap[left]) {
+                if (heap[curr].dist > heap[left].dist) {
                     swap(curr, left);
                     break;
                 }
             } else {
-                var smaller = heap[left] < heap[right] ? left : right;
-                if (heap[curr] > heap[smaller]) {
+                var smaller = heap[left].dist < heap[right].dist ? left : right;
+                if (heap[curr].dist > heap[smaller].dist) {
                     swap(curr, smaller);
                     curr = smaller;
+                } else {
+                	break;
                 }
             }
         }
