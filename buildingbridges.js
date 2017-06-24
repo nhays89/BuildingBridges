@@ -5,20 +5,22 @@ var rows, cols, map, queue, arr, blgs;
 
 //runner
 function main(input) {
-    var data = input.splice("\n");
+    var data = input.split("\n");
     var index = 0;
     var city = 0;
 
     while (true) {
-        var dims = data[index++].splice(" ");
+        var dims = data[index++].split(" ");
         rows = dims[0];
         cols = dims[1];
-        queue = new PriorityHeap();
-        map = {};
-        arr = [];
-        bldgs = [];
         if (rows == 0 && cols == 0)
             break;
+        queue = new PriorityHeap(); // will be a min priority heap
+        map = {}; // will contain a map of all nodes
+        arr = []; // will hold input 
+        bldgs = []; // will contain all nodes and the location for all buildings generated
+        city++;
+
         for (var i = 0; i < rows; i++) {
             arr[i] = [];
             var str = data[index++];
@@ -27,13 +29,10 @@ function main(input) {
                 arr[i][j] = str[j];
             }
         }
-        var numOfBldgs = genBldgs();
-        for (i = 0; i < numOfBldgs; i++) {
-            bldgs[i] = i;
-        }
+        genBldgs();
         search();
-        var data = buildBridges();
-        output(data);
+        var bridgeData = buildBridges();
+        output(city, bridgeData);
     }
 }
 
@@ -44,14 +43,16 @@ function genBldgs() {
         for (var j = 0; j < cols; j++) {
             if (arr[i][j] == "#") {
                 if (!map[i][j]) {
-                    genBldg(i, j, numOfBldgs);
-                    numOfBldgs++;
+                    var nodes = [];
+                    genBldg(i, j, numOfBldgs, nodes);
+                    var bldg = { bldg: numOfBldgs++, reachable: [] };
+                    bldg.reachable.push(bldg);
+                    console.log(bldg);
+                    bldgs.push(bldg);
                 }
             }
         }
     }
-    return numOfBldgs;
-
 }
 
 //generate building
@@ -61,23 +62,24 @@ function genBldg(row, col, bldg) {
     }
     map[row][col] = { x: row, y: col, bldg: bldg };
     var nodes = getAdjNodes(row, col);
-    nodes.forEach(function(o) {
-        genBldg(o.x, o.y, bldg);
-    });
+    if (nodes) {
+        for (var i = 0; i < nodes.length; i++) {
+            genBldg(nodes[i].x, nodes[i].y, bldg);
+        }
+    }
+
 
 }
 
 
-
 //get adjacent nodes in bldg that are currently not in the map of nodes
-function getAdjNodes(row, col) {
-    var nodes = [];
+function getAdjNodes(row, col, bldg, nodes) {
     var el;
     //left: row, col -1
     if (col - 1 >= 0) {
         el = arr[row][col - 1];
         if (el == '#' && !map[row][col - 1]) {
-            nodes.push({ x: row, y: col - 1 });
+            nodes.push({ x: row, y: col - 1, bldg: bldg });
         }
     }
 
@@ -85,7 +87,7 @@ function getAdjNodes(row, col) {
     if (row + 1 < rows && col - 1 >= 0) {
         el = arr[row + 1][col - 1];
         if (el == '#' && !map[row + 1][col - 1]) {
-            nodes.push({ x: row + 1, y: col - 1 });
+            nodes.push({ x: row + 1, y: col - 1, bldg: bldg });
         }
     }
 
@@ -93,7 +95,7 @@ function getAdjNodes(row, col) {
     if (row + 1 < rows) {
         el = arr[row + 1][col];
         if (el == '#' && !map[row + 1][col]) {
-            nodes.push({ x: row + 1, y: col });
+            nodes.push({ x: row + 1, y: col, bldg: bldg });
         }
     }
 
@@ -101,7 +103,7 @@ function getAdjNodes(row, col) {
     if (row + 1 < rows && col + 1 < cols) {
         el = arr[row + 1][col + 1];
         if (el == '#' && !map[row + 1][col + 1]) {
-            nodes.push({ x: row + 1, y: col + 1 });
+            nodes.push({ x: row + 1, y: col + 1, bldg: bldg });
         }
     }
 
@@ -109,7 +111,7 @@ function getAdjNodes(row, col) {
     if (col + 1 < cols) {
         el = arr[row][col + 1];
         if (el == '#' && !map[row][col + 1]) {
-            nodes.push({ x: row, y: col + 1 });
+            nodes.push({ x: row, y: col + 1, bldg: bldg });
         }
     }
 
@@ -117,7 +119,7 @@ function getAdjNodes(row, col) {
     if (row - 1 >= 0 && col + 1 < cols) {
         el = arr[row - 1][col + 1];
         if (el == '#' && !map[row - 1][col + 1]) {
-            nodes.push({ x: row - 1, y: col + 1 });
+            nodes.push({ x: row - 1, y: col + 1, bldg: bldg });
         }
     }
 
@@ -125,7 +127,7 @@ function getAdjNodes(row, col) {
     if (row - 1 >= 0) {
         el = arr[row - 1][col];
         if (el == '#' && !map[row - 1][col]) {
-            nodes.push({ x: row - 1, y: col });
+            nodes.push({ x: row - 1, y: col, bldg: bldg });
         }
     }
 
@@ -134,12 +136,9 @@ function getAdjNodes(row, col) {
     if (row - 1 >= 0 && col - 1 >= 0) {
         el = arr[row - 1][col - 1];
         if (el == '#' && !map[row - 1][col - 1]) {
-            nodes.push({ x: row - 1, y: col - 1 });
+            nodes.push({ x: row - 1, y: col - 1, bldg: bldg });
         }
     }
-
-    return nodes;
-
 }
 
 function search() {
@@ -160,7 +159,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(y - dy) - 1 });
                         }
                         break;
                     }
@@ -175,7 +174,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(y - dy) - 1 });
                         }
                         break;
                     }
@@ -191,7 +190,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(y - dy) - 1 });
                         }
                         break;
                     }
@@ -208,7 +207,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(x - dx) - 1 });
                         }
                         break;
                     }
@@ -223,7 +222,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(x - dx) - 1 });
                         }
                         break;
                     }
@@ -240,7 +239,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(x - dx) - 1 });
                         }
                         break;
                     }
@@ -256,7 +255,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(y - dy) - 1 });
                         }
                         break;
                     }
@@ -272,7 +271,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(y - dy) - 1 });
                         }
                         break;
                     }
@@ -288,7 +287,7 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.y - destNode.y) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(y - dy) - 1 });
                         }
                         break;
                     }
@@ -304,11 +303,11 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(x - dx) - 1 });
                         }
                         break;
                     }
-                    dx--;;
+                    dx--;
                 }
 
             }
@@ -320,11 +319,11 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(x - dx) - 1 });
                         }
                         break;
                     }
-                    dx--;;
+                    dx--;
                 }
 
             }
@@ -337,11 +336,11 @@ function search() {
                     if (map[dx][dy]) {
                         if (map[dx][dy].bldg != bldg) {
                             var destNode = map[dx][dy];
-                            queue.insert({ src: node.bldg, dest: destNode.bldg, dist: Math.abs(node.x - destNode.x) - 1 });
+                            queue.insert({ src: node, dest: destNode, dist: Math.abs(x - dx) - 1 });
                         }
                         break;
                     }
-                    dx--;;
+                    dx--;
                 }
 
             }
@@ -353,34 +352,81 @@ function search() {
 
 function buildBridges() {
 
-	//while obj && els
-	var bridge = queue.poll();
-	var numOfBridges = 0;
-	var bridgesLength = 0;
-	while(bridge && bldgs.length > 0) {
-		if(blgs[bridge.src] || bldgs[bridge.dest]) {
-			numOfBridges++;
-			bridgesLength += bridge.dist;
-			var srcIndex = bldgs.indexOf(bridge.src);
-			if(srcIndex > -1) {
-				bldgs.splice(srcIndex, 1);
-			}
-			var destIndex = bldgs.indexOf(bridge.dest);
-			if(destIndex > -1) {
-				bldgs.splice(destIndex, 1);
-			}
-		}
-		bridge = queue.poll();
-	}
-	return { numOfBridges: numOfBridges, len: bridgesLength, remaining: bldgs.length};
+    //while obj && els
+    var bridge = queue.poll();
+    var numOfBridges = 0;
+    var bridgesLength = 0;
+
+    while (bridge && isBridgeRemaining()) {
+        var srcBldg = bldgs[bridge.src.bldg];
+        var destBldg = bldgs[bridge.dest.bldg];
+        var canBuild = true;
+        if (!srcBldg.reachable.includes(destBldg)) {
+        	console.log(bridge);
+            var srcBldgs = srcBldg.reachable;
+            var destBldgs = destBldg.reachable;
+            var srcLen = srcBldgs.length;
+            var destLen = destBldgs.length;
+            console.log("before: ");
+            console.log(srcBldg.reachable);
+            for( var i = 0 ; i < srcLen; i++ ) {
+            	srcBldgs[i].reachable = srcBldgs[i].reachable.concat(destBldgs);
+            }
+             console.log("after: ");
+            console.log(srcBldg.reachable);
+           
+            for(i = 0; i < destLen; i++) {
+            	destBldgs[i].reachable = destBldgs[i].reachable.concat(srcBldgs);
+            }
+            numOfBridges++;
+            bridgesLength += bridge.dist;
+
+            bridge = queue.poll();
+        }
+    }
+    return { numOfBridges: numOfBridges, len: bridgesLength, remaining: bldgs.length };
+}
+
+//tests to see if all buildings are connected.
+
+function isBridgeRemaining() {
+
+    var bldg = bldgs[0];
+    var numOfBldgs = bldgs.length;
+    var isBridgeNeeded = true;
+    if (numOfBldgs == 1) {
+        isBridgeNeeded = false;
+    } else {
+        if (bldg.reachable.length == numOfBldgs) {
+            isBridgeNeeded = false;
+        }
+    }
+    return isBridgeNeeded;
 }
 
 
-function output() {
+function output(city, data) {
+    console.log("City " + city);
+    if (bldgs.length < 2) {
+        console.log("No bridges are needed.");
+    } else {
+        if (data.numOfBridges > 0) {
+            console.log(data.numOfBridges + " bridges of total length " + data.len);
+        } else {
+            console.log("No bridges are possible.");
+        }
 
-
-
-
+        if (data.remaining > 0) {
+            var disconnected;
+            if (data.numOfBridges) {
+                disconnected = data.remaining + 1;
+            } else {
+                disconnected = data.remaining;
+            }
+            console.log(data.remaining + "disconnected groups");
+        }
+    }
+    console.log("/n");
 }
 
 
