@@ -8,19 +8,19 @@ function main(input) {
     var data = input.split("\n");
     var index = 0;
     var city = 0;
-
+	queue = new PriorityHeap();
     while (true) {
         var dims = data[index++].split(" ");
         rows = dims[0];
         cols = dims[1];
         if (rows == 0 && cols == 0)
             break;
-        queue = new PriorityHeap(); // will be a min priority heap
+         // will be a min priority heap
         map = {}; // will contain a map of all nodes
         arr = []; // will hold input 
         bldgs = []; // will contain all nodes and the location for all buildings generated
         city++;
-
+        queue.clear();
         for (var i = 0; i < rows; i++) {
             arr[i] = [];
             var str = data[index++];
@@ -47,7 +47,6 @@ function genBldgs() {
                     genBldg(i, j, numOfBldgs, nodes);
                     var bldg = { bldg: numOfBldgs++, reachable: [] };
                     bldg.reachable.push(bldg);
-                    console.log(bldg);
                     bldgs.push(bldg);
                 }
             }
@@ -61,7 +60,7 @@ function genBldg(row, col, bldg) {
         return;
     }
     map[row][col] = { x: row, y: col, bldg: bldg };
-    var nodes = getAdjNodes(row, col);
+    var nodes = getAdjNodes(row, col, bldg);
     if (nodes) {
         for (var i = 0; i < nodes.length; i++) {
             genBldg(nodes[i].x, nodes[i].y, bldg);
@@ -73,9 +72,10 @@ function genBldg(row, col, bldg) {
 
 
 //get adjacent nodes in bldg that are currently not in the map of nodes
-function getAdjNodes(row, col, bldg, nodes) {
+function getAdjNodes(row, col, bldg) {
     var el;
     //left: row, col -1
+    var nodes = [];
     if (col - 1 >= 0) {
         el = arr[row][col - 1];
         if (el == '#' && !map[row][col - 1]) {
@@ -139,6 +139,7 @@ function getAdjNodes(row, col, bldg, nodes) {
             nodes.push({ x: row - 1, y: col - 1, bldg: bldg });
         }
     }
+    return nodes;
 }
 
 function search() {
@@ -362,18 +363,13 @@ function buildBridges() {
         var destBldg = bldgs[bridge.dest.bldg];
         var canBuild = true;
         if (!srcBldg.reachable.includes(destBldg)) {
-        	console.log(bridge);
             var srcBldgs = srcBldg.reachable;
             var destBldgs = destBldg.reachable;
             var srcLen = srcBldgs.length;
             var destLen = destBldgs.length;
-            console.log("before: ");
-            console.log(srcBldg.reachable);
             for( var i = 0 ; i < srcLen; i++ ) {
             	srcBldgs[i].reachable = srcBldgs[i].reachable.concat(destBldgs);
             }
-             console.log("after: ");
-            console.log(srcBldg.reachable);
            
             for(i = 0; i < destLen; i++) {
             	destBldgs[i].reachable = destBldgs[i].reachable.concat(srcBldgs);
@@ -381,10 +377,10 @@ function buildBridges() {
             numOfBridges++;
             bridgesLength += bridge.dist;
 
-            bridge = queue.poll();
         }
+            bridge = queue.poll();
     }
-    return { numOfBridges: numOfBridges, len: bridgesLength, remaining: bldgs.length };
+    return { numOfBridges: numOfBridges, len: bridgesLength };
 }
 
 //tests to see if all buildings are connected.
@@ -416,17 +412,14 @@ function output(city, data) {
             console.log("No bridges are possible.");
         }
 
-        if (data.remaining > 0) {
-            var disconnected;
-            if (data.numOfBridges) {
-                disconnected = data.remaining + 1;
-            } else {
-                disconnected = data.remaining;
-            }
-            console.log(data.remaining + "disconnected groups");
+        if (data.numOfBridges < bldgs.length - 1) {
+          
+            var numOfDisc = Math.abs(bldgs.length - data.numOfBridges);
+           
+            console.log(numOfDisc + " disconnected groups");
         }
     }
-    console.log("/n");
+    console.log("");
 }
 
 
