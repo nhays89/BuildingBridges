@@ -86,8 +86,8 @@ No bridges are needed.</br>
    &nbsp;&nbsp;...<br>
    &nbsp;}, <br>
    &nbsp;"1": {<br>
-   &nbsp;&nbsp;"2": {x: 1, y: 2, bldgNum: 2},<br>
-   &nbsp;&nbsp;"3": {x: 1, y: 5, bldgNum: 2}<br>
+   &nbsp;&nbsp;"2": {x: 1, y: 2, bldgNum: 0},<br>
+   &nbsp;&nbsp;"6": {x: 1, y: 6, bldgNum: 1}<br>
    &nbsp;&nbsp;...<br>
    &nbsp;},<br>
    &nbsp;...<br>
