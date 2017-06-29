@@ -75,16 +75,30 @@ No bridges are needed.</br>
 2 disconnected groups</br>
 
 ## Solution
-1) parse input.<br>
+1) parse input into a 2d array.<br>
 2) generate nodes for each # and group adjacent nodes into buildings.<br>
-3) calculate bridge length between each node in each building from its reachable neighbor nodes in every direction<br>
-   and insert the bridge length along with the buildings connecting it into a min priority heap.<br>
-4) while there are remaining elements in the heap and unvisited buildings:<br>
-  a) remove the element,<br>
-  b) if either the source building or destination building or both have not yet been visited add the length between the buildings
-      to a counter and mark the source building, destination building, or both, respectively as visited. <br>
-  c) else ignore it.<br>
-5) output the result in the format expected.<br>
-
-
-
+3) store each of the nodes in a map object, where each property of the map 
+   represents the index of each row in the grid. The row object will contain the index of each node in that row (the columns).  
+   &nbsp;var map = {<br>
+   &nbsp;"0": {<br>
+   &nbsp;&nbsp;"3": { x: 0, y: 3, bldgNum: 0}<br>
+   &nbsp;&nbsp;"7": { x :0, y: 7, bldgNum: 1}<br> 
+   &nbsp;&nbsp;...<br>
+   &nbsp;}, <br>
+   &nbsp;"1": {<br>
+   &nbsp;&nbsp;"2": {x: 1, y: 2, bldgNum: 2}<br>
+   &nbsp;&nbsp;"3": {x: 1, y: 5, bldgNum: 2}<br>
+   &nbsp;&nbsp;...<br>
+   &nbsp;},<br>
+   &nbsp;...<br>
+   &nbsp;};<br>
+4) create a list of building objects. <br>
+   [{ bldgNum: 1, reachable: [] }, {bldgNum: 2, reachable: [], ...]<br>
+   -each building object will contain a list of reachable buildings initially empty but soon to be populated.<br>
+5) for each node, s, in the map calculate the distance from s to every other reachable node, d, and insert an object containing the       buildings of each node along with the distance between them into a min priority queue where s and d do no have the same building.     i.e {src: 1, dest: 2, distance: 10 }.<br>
+   -this distance will serve as the bridge between the nodes of neighboring buildings.<br>
+6) while there are bridges remaining in the queue and buildings not connected:<br>
+&nbsp;a) remove an element from the queue,<br>
+&nbsp;b) if the src building and dest building are not connected and connecting them will not create a cycle ?<br>
+&nbsp;&nbsp;1) merge the src and dest reachable buildings together such that the src's reachable buildings will contain all the &nbsp;&nbsp;dest reachable buildings and vice versa (compute transitive closure). 
+7) output the result in the format expected.<br>
