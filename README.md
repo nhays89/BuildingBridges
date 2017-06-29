@@ -81,12 +81,12 @@ No bridges are needed.</br>
    represents the index of each row in the grid. The row object will contain the index of each node in that row (the columns).  
    &nbsp;var map = {<br>
    &nbsp;"0": {<br>
-   &nbsp;&nbsp;"3": { x: 0, y: 3, bldgNum: 0}<br>
+   &nbsp;&nbsp;"3": { x: 0, y: 3, bldgNum: 0},<br>
    &nbsp;&nbsp;"7": { x :0, y: 7, bldgNum: 1}<br> 
    &nbsp;&nbsp;...<br>
    &nbsp;}, <br>
    &nbsp;"1": {<br>
-   &nbsp;&nbsp;"2": {x: 1, y: 2, bldgNum: 2}<br>
+   &nbsp;&nbsp;"2": {x: 1, y: 2, bldgNum: 2},<br>
    &nbsp;&nbsp;"3": {x: 1, y: 5, bldgNum: 2}<br>
    &nbsp;&nbsp;...<br>
    &nbsp;},<br>
