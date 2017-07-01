@@ -1,9 +1,39 @@
-//Author: Nicholas A. Hays
+/*
 
-//globals
+Author: Nicholas A. Hays
+
+2721 - Building Bridges 
+ACM ICPC World Finals Beverly Hills
+
+Determines the total number of bridges needed to connect a given set of buildings together over a 2d grid.
+Each building is composed of one or more adjacent nodes. The nodes are stored in a map, accessible by their 
+xy grid location. For each node in the map, distances are calculated between the node and its nearby neighboring nodes.
+If the 2 nodes are not in the same building, then a bridge must be created to connect their buildings.
+For each bridge that is created, an object is stored in a minimum priority queue that consists of the buildings
+that connect that bridge, along with the length of the bridge. The queue is sorted by the length of the bridge.
+Thus once all the calculations have been made, the queue is polled until all buildings have been connected. 
+There may be instances where buildings cannot be connected because their nodes do not fall on the same grid lines.
+In these cases there will be disconnected buildings indicated by the fact that a given building's list of reachable buildings
+does not contain all the buildings when the queue is completely empty; therefore, we know that there are disjoint 
+buildings (by transitive closure). 
+
+*/
+
+/*
+
+Globals
+
+*/
 var rows, cols, map, queue, arr, blgs;
 
-//runner
+/*
+
+Runner.
+Parses input into a 2d array.
+@input - the input string
+i.e "3 5\n#...#\n..#..\n#...#\n0 0"
+*/
+
 function main(input) {
     var data = input.split("\n");
     var index = 0;
@@ -36,7 +66,13 @@ function main(input) {
     }
 }
 
-//generate buildings 
+/*
+
+Each building object contains its number along with a list of reachable 
+buildings. Each new building adds itself to its list of reachable 
+buildings. a -> a
+
+*/
 function genBldgs() {
     var numOfBldgs = 0;
     for (var i = 0; i < rows; i++) {
@@ -54,7 +90,30 @@ function genBldgs() {
     }
 }
 
-//generate building
+/*
+
+Recursively generates a building by adding all adjacent nodes to this building.
+Then for each adjacent node, adds all of its adjacent nodes...etc.
+example bldg:
+
+..#.
+..##
+...#
+..#.
+.#..
+###.
+
+(0,2) - > [(1,2), (1,3)]
+(1,2) - > [(2,3)]
+(2,3) - > [(3,2)]
+(3,2) - > [(4,1)]
+(4,1) - > [(5,0), (5,1), (5,2)]
+(5,0) - > []
+(5,1) - > []
+(5,2) - > []
+(1,3) - > []
+
+*/
 function genBldg(row, col, bldg) {
     if (map[row][col]) {
         return;
@@ -71,7 +130,13 @@ function genBldg(row, col, bldg) {
 }
 
 
-//get adjacent nodes in bldg that are currently not in the map of nodes
+/*
+
+Helper to genBldg.
+Get adjacent nodes for a given bldg if those nodes are not
+already in the map of nodes.
+
+*/
 function getAdjNodes(row, col, bldg) {
     var el;
     //left: row, col -1
@@ -142,6 +207,42 @@ function getAdjNodes(row, col, bldg) {
     return nodes;
 }
 
+/*
+
+Searches for nearby neighbors.
+
+Example. 
+searching node location: S 
+X's denote search coordinates.
+If an X is a #, and that #'s bldg does not equal S's bldg.
+Add a new object into the queue:
+{
+    src: S,
+    dest: X,
+    dist: S.coord - X.coord
+}
+
+
+
+                      ^ ^ ^
+                      | | |   
+            0 0 0 0 0 X X X 0 0 0 0 0
+            0 0 0 0 0 X X X 0 0 0 0 0
+            0 0 0 0 0 X X X 0 0 0 0 0
+            0 0 0 0 0 X X X 0 0 0 0 0
+            0 0 0 0 0 X X X 0 0 0 0 0
+        < - X X X X X 0 0 0 X X X X X - >
+        < - X X X X X 0 S 0 X X X X X - >
+        < - X X X X X 0 0 0 X X X X X - >
+            0 0 0 0 0 X X X 0 0 0 0 0 
+            0 0 0 0 0 X X X 0 0 0 0 0
+            0 0 0 0 0 X X X 0 0 0 0 0
+            0 0 0 0 0 X X X 0 0 0 0 0 
+            0 0 0 0 0 X X X 0 0 0 0 0 
+                      | | |
+                      V V V
+
+*/
 function search() {
     for (var r in map) {
         var row = map[r];
@@ -350,10 +451,35 @@ function search() {
     }
 }
 
+/*
 
+Continues to connect buildings while there are elements remaining in the queue,
+and buildings remain unreachable. Computes the transitive closure of each building after each new
+connection is made.
+
+ex: 
+queue:
+
+0 - > 1  1 
+1 - > 0  1
+2 - > 9  1
+9 - > 2  1
+7 - > 3  2
+6 - > 5  2
+3 - > 7  2
+5 - > 6  2
+...
+
+bridges:
+0 - > 1  1
+2 - > 9  2
+7 - > 3  2
+...
+
+
+*/
 function buildBridges() {
 
-    //while obj && els
     var bridge = queue.poll();
     var numOfBridges = 0;
     var bridgesLength = 0;
@@ -383,8 +509,11 @@ function buildBridges() {
     return { numOfBridges: numOfBridges, len: bridgesLength };
 }
 
-//tests to see if all buildings are connected.
+/*
 
+A Helper that tests to see if all buildings are connected.
+
+*/
 function isBridgeRemaining() {
 
     var bldg = bldgs[0];
@@ -400,7 +529,12 @@ function isBridgeRemaining() {
     return isBridgeNeeded;
 }
 
+/*
 
+Display's formatted output to console of the total number of bridges,
+sum of all the length's of bridges, and disconnected buildings (if any).
+
+*/
 function output(city, data) {
     console.log("City " + city);
     if (bldgs.length < 2) {
@@ -422,14 +556,20 @@ function output(city, data) {
     console.log("");
 }
 
+/*
 
+A priority heap to store the bridges between buildings.
+
+*/
 function PriorityHeap() {
 
     var heap = [];
     this.h = heap;
     this.new = 0;
     var lastInsert = 0;
-
+    /*
+        Inserts a node into the heap.
+    */
     this.insert = function(child) {
         if (heap.length == 0) {
             heap.push(child);
@@ -464,9 +604,17 @@ function PriorityHeap() {
         }
     }
 
+    /*
+        Checks to see the first node.
+    */
+
     this.peek = function() {
         return heap[0];
     }
+
+    /*
+        Removes and returns the first element of the heap.
+    */
 
     this.poll = function() {
         if (heap.length == 0) {
@@ -498,7 +646,9 @@ function PriorityHeap() {
         lastInsert--;
         return el;
     }
-
+    /* 
+        Clears the heap.
+    */
     this.clear = function() {
         var len = heap.length;
         for (var i = 0; i < len; i++) {
@@ -507,7 +657,9 @@ function PriorityHeap() {
         lastInsert = 0;
     }
 
-
+    /*
+        Swaps nodes in the heap.
+    */  
     var swap = function(childIndex, parentIndex) {
         if (childIndex == parentIndex) {
             return;
