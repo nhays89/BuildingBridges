@@ -100,5 +100,5 @@ No bridges are needed.</br>
 6) while there are bridges remaining in the queue and buildings not connected:<br>
 &nbsp;a) remove an element from the queue,<br>
 &nbsp;b) if the src building and dest building are not connected and connecting them will not create a cycle ?<br>
-&nbsp;&nbsp;1) merge the src and dest reachable buildings together such that the src's reachable buildings will contain all the &nbsp;&nbsp;dest reachable buildings and vice versa (compute transitive closure). 
+&nbsp;&nbsp;1) merge the src and dest reachable buildings together such that the src's reachable buildings will contain all the &nbsp;&nbsp;dest reachable buildings and vice versa (compute transitive reduction). 
 7) output the result in the format expected.<br>
